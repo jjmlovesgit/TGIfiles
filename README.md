@@ -1,5 +1,5 @@
 # TGIfiles
-A set of scripts and files to help you run Hugging Face Text Generation Inference (TGI)
+A set of scripts and files to help you run Hugging Face Text Generation Inference (TGI) locally 100% private configuration "How to" Guide
 
 Link to Youtube Video for context:  https://youtu.be/s27m_LRSvqM
 

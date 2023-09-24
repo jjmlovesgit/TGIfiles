@@ -1,0 +1,167 @@
+#Installation Steps for TGI
+
+Open command prompt
+wsl --set-default-version 2
+wsl --list --online
+wsl --install -d Ubuntu
+sudo apt update
+sudo apt upgrade
+
+
+New Linux Windows will Open…
+Note - To stop:  wsl -t Ubuntu
+
+cd ~
+gcc --version
+sudo apt install gcc --fix-missing
+
+Next is 
+CUDA Toolkit 11.8 Downloads | NVIDIA Developer
+Installer Instructions for Linux WSL-Ubuntu 2.0 x86_64
+
+Base Installer	
+Installation Instructions:
+
+wget https://developer.download.nvidia.com/compute/cuda/repos/wsl-ubuntu/x86_64/cuda-wsl-ubuntu.pin
+sudo mv cuda-wsl-ubuntu.pin /etc/apt/preferences.d/cuda-repository-pin-600
+wget https://developer.download.nvidia.com/compute/cuda/11.8.0/local_installers/cuda-repo-wsl-ubuntu-11-8-local_11.8.0-1_amd64.deb
+sudo dpkg -i cuda-repo-wsl-ubuntu-11-8-local_11.8.0-1_amd64.deb
+sudo cp /var/cuda-repo-wsl-ubuntu-11-8-local/cuda-*-keyring.gpg /usr/share/keyrings/
+sudo dpkg -i cuda-repo-wsl-ubuntu-11-8-local_11.8.0-1_amd64.deb
+sudo apt-get update
+sudo apt-get -y install cuda
+
+
+
+○ cd ~
+○ sudo apt-get install git-lfs
+○ nano .bashrc
+export PATH=/usr/local/cuda-11.8/bin${PATH:+:${PATH}}         
+	Note put this as last line in the file
+
+○ source ~/.bashrc
+○ echo $PATH
+○ sudo apt install nvidia-cuda-toolkit
+○ nvcc -V
+○ nvidia-smi
+
+○ nvidia-smi
+○ sudo apt-get install python3-pip
+○ pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+○ python3
+	import torch
+	torch.cuda.is_available()
+	• torch.__version__
+
+
+**** take a break ***
+
+
+○ mkdir tgi
+○ cd tgi
+○ In tgi directory off home
+○ sudo git clone https://github.com/huggingface/text-generation-inference.git
+○ cd text-generation-inference
+○ In tgi/text-generation-inference
+○ sudo mkdir data
+○ cd data
+○ ls -all
+
+○ In tgi/text-generation-inference/data
+○ Be sure you have sudo apt-get install git-lfs
+○ git lfs version
+○ sudo git clone https://huggingface.co/TheBloke/Llama-2-7b-Chat-GPTQ
+○ ls -all
+
+○ In tgi/text-generation-inference/data
+○ Ls -all 
+○ You will see Llama-2-7b-Chat-GPTQ
+
+○ Do you need to install Docker Desktop?
+ü 1. Install WSL 2:
+Follow the instructions in the official Microsoft documentation to install and set up WSL 2. This will involve enabling the WSL feature, enabling the Virtual Machine Platform feature, and configuring WSL 2 as your default WSL version.
+
+ü 2. Install Docker Desktop for Windows:
+Download Docker Desktop Installer:
+Download the latest version of Docker Desktop from the official Docker website.
+
+Install Docker Desktop:
+Run the installer and follow the on-screen instructions to install Docker Desktop. During installation, ensure that the "Install required Windows components for WSL 2" option is selected.
+
+Configure Docker Desktop:
+
+Once the installation is complete, run Docker Desktop.
+	• Go to Settings > General.
+	• Ensure that the "Use the WSL 2 based engine" option is selected.
+	• Go to Settings > Resources > WSL INTEGRATION.
+	• Enable integration with your Ubuntu distribution.
+		○ sudo apt-get install docker.io
+		○ sudo usermod -aG docker $USER
+		○ newgrp docker
+	• Access Docker from Ubuntu on WSL 2:
+		○ docker ps -a
+
+○ docker run --rm  --entrypoint /bin/bash -it --name Llama-2-7B-Chat-GPTQ -v /home/mccorji/tgi/text-generation-inference/data:/data --gpus all -p 8080:80 ghcr.io/huggingface/text-generation-inference:latest
+○ Ls -all 
+○ You will see Llama-2-7b-Chat-GPTQ
+○ cd /data
+
+If you can mount the /data and view if from /usr/src we are in great shape
+Launch another Terminal session for Ubuntu and stop the container 
+	• cd ..
+	
+
+○ From text-generation-inference dir
+○ sudo nano Start_7b_GPTQ.sh
+○ Copy the  file below and Crtl+X  to save
+
+
+#!/bin/bash
+#Start up for running Local off the Internet for Demo 9/22/23
+#Copy this to where you cloned the text-generation-inforence files
+# Variables
+model="Llama-2-7b-Chat-GPTQ"
+volume="$PWD/data"
+# Echo starting message
+echo "Starting the Docker container with local files (No Internet): $model and volume: $volume ..."
+# Start the Docker container
+docker run --rm --entrypoint /bin/bash -itd \
+  --name $model \
+  -v $volume:/data \
+  --gpus all -p 8080:80 ghcr.io/huggingface/text-generation-inference:latest
+# Check if the container started successfully
+if [ $? -eq 0 ]; then
+    echo "Container started successfully!"
+else
+    echo "Failed to start the container."
+    exit 1
+fi
+# Echo running the launcher message
+echo "Running the text-generation-launcher command from /data directory inside the container...Local Files only will be used"
+docker exec $model bash -c "text-generation-launcher --model-id /data/$model --quantize gptq --num-shard 1"
+# Check if the text-generation-launcher command was successful
+if [ $? -eq 0 ]; then
+    echo "text-generation-launcher ran successfully!"
+else
+    echo "Failed to run text-generation-launcher."
+    exit 1
+fi
+
+
+○ CHMOD to make it executable:  
+	• sudo chmod +x ./Start_7b_GPTQ.sh
+if you get errors about windows carriage returns
+		sudo apt-get update
+		sudo apt-get install dos2unix
+	• dos2unix ./start.sh
+
+○ Run it
+	• ./Start_7b_GPTQ.sh
+
+
+○ Docker commands
+	•  docker stop $(docker ps -q) 
+	• docker ps -a
+
+○ Test on Swagger API per video
+http://localhost:8080/docs/

@@ -3,6 +3,9 @@ A set of scripts and files to help you run Hugging Face Text Generation Inferenc
 
 Link to Youtube Video for context:  https://youtu.be/s27m_LRSvqM
 
+https://studio.youtube.com/video/s27m_LRSvqM/edit
 ![image](https://github.com/jjmlovesgit/TGIfiles/assets/47751509/b6ece768-8cba-4ff0-ab30-34c3ebb3d8fc)
 
+
+https://studio.youtube.com/video/mpX6ByX80Jw/edit
 ![image](https://github.com/jjmlovesgit/TGIfiles/assets/47751509/93c3af2d-b7a7-47ea-8459-e3ad20dfb4b2)
